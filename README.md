@@ -131,49 +131,74 @@
 
 ### Thinking Process
 
-Step 1: ทำความเข้าใจเกมและวางเงื่อนไขหลัก
-• ผู้เล่นต้องเดินในแผนที่ 2 มิติเพื่อหา "หมวก" (^) ที่ซ่อนอยู่
-• หลีกเลี่ยงการตก "หลุม" (O) หรือเดินออกนอกขอบสนาม
-• ผู้เล่นเริ่มต้นที่ตำแหน่ง [0][0] โดยทิ้งรอยไว้เป็น \*
+1. Understand the Game Requirements
+   • Player starts at the top left corner (\*) of a 2D field.
+   • Goal: find a hat (^).
+   • Lose by stepping into a hole (O) or moving out of bounds.
+   • Accept only W/A/S/D controls.
+   • Show a welcome screen and replay option.
+   • Add warnings before an out of bounds move and colorize key messages.
 
-Step 2: ออกแบบโครงสร้างโปรแกรม
-• สร้างคลาส Field เพื่อเป็นตัวแทนของสนามทั้งหมด
-• กำหนดเมธอดหลัก เช่น print(), move(), askQuestion(), generateField()
-• ใช้ prompt-sync และ clear-screen เพื่อโต้ตอบกับผู้เล่นผ่าน terminal
+2. Set Up the CLI Environment
+   • Use prompt sync for synchronous user input.
+   • Use clear screen to redraw the field cleanly on each turn.
 
-Step 3: สร้างกลไกควบคุมการเคลื่อนที่
-• เขียนเมธอด askQuestion() เพื่อรับ input ทิศทางจากผู้เล่น (U/D/L/R)
-• เขียนเมธอด move() เพื่อคำนวณตำแหน่งใหม่
-• ตรวจสอบสถานะตำแหน่งใหม่ว่า:
-  o ชนะ (เจอหมวก ^)
-  o แพ้ (ตกหลุม O)
-  o ออกจากสนาม -->
+3. Define Game Symbols
+   • hat = "^"
+   • hole = "O"
+   • fieldCharacter = "░" (empty tile)
+   • pathCharacter = "\*" (player’s trail)
 
-Step 4: เพิ่มระบบสุ่มสนามให้แตกต่างกันในแต่ละรอบ
-• สร้างเมธอด static generateField(height, width, holePercentage)
-• ใช้ Math.random() ในการสุ่มหลุม (O) และพื้นที่ปกติ (░)
-• สุ่มตำแหน่งของหมวก ^ โดยหลีกเลี่ยง [0][0]
-• วางตำแหน่งเริ่มต้นของผู้เล่นไว้ที่ [0][0]
+4. Design the Field Class
+   • Constructor
+   a. Accepts a 2D array (field).
+   b. Initializes player position at [0,0], marks it with \*.
+   c. Tracks gameOver state and last warning direction.
 
-Step 5: สร้างโครงสร้างเกมหลักและลูปการเล่น
-• สร้างฟังก์ชัน playGame() เพื่อควบคุมลูปเกม
-• ใช้ลูป while (!gameOver) เพื่อวนการเล่น
-• ในแต่ละรอบแสดงแผนที่ใหม่ (print()) และรับ input (askQuestion())
+   • print() Method
+   a. Clears the console and prints each row of the field.
+   b. Renders the current \* in bold red
+   c. Renders any ^ (hat) in bold green.
 
-Step 6: เพิ่มระบบถามเล่นซ้ำ (Play Again)
-• เมื่อเกมจบ (แพ้หรือชนะ) ให้แสดงข้อความ "Game Over"
-• ถามผู้เล่นว่าอยากเล่นใหม่ไหม (Y/N)
-• ถ้าตอบ Y → เรียก playGame() อีกครั้งเพื่อเริ่มใหม่
-• ถ้าตอบ N → แสดง "Goodbye!" และปิดโปรแกรม
+   • askQuestion() Method
+   a. Prompts “Which way? (W/A/S/D):”
+   b. Normalizes input, then calls one of four methods:moveUp(), moveDown(), moveLeft(), moveRight().
+   c. Handles invalid keys by warning the user and pausing.
+   Prompts “Which way? (W/A/S/D):”.
 
-Step 7: ทดสอบทุกกรณีเพื่อความถูกต้องและสมบูรณ์
-• ทดสอบกรณี:
-  o เดินตกหลุม
-  o เดินออกขอบ
-  o เดินถึงหมวก
-  o การอัปเดตตำแหน่งบนแผนที่
-  o การสุ่มแผนที่แต่ละรอบ
-  o การวนเล่นใหม่
+   • move() Method
+   a. Calculates new position.
+   b. Out of bounds logic: - On first attempt, warn “If you go <dir> again it will be out of bounds…” and pause. - If the same direction is chosen again, trigger game over with a red “You went out of bounds!” message.
+   c. Hole check: if stepping on O, red “You fell into a hole! Game Over.”
+   d. Hat check: if stepping on ^, green “Congratulations, you found your hat! 🎉”
+   e. Otherwise, update position and mark the path.
+
+   • isOutOfBounds() Helper
+   a. Returns true if row/col is outside the field dimensions.
+   • static generateField()
+   a. Builds a random height×width field, placing holes according to holePercentage.
+   b. Ensures the start is \* and places the hat at a random non start position.
+
+5. Implement the Main Game Loop (playGame())
+   • Welcome screen: clear console, display title, goal, then the controls block in bold red with arrow emojis (⬆️⬇️⬅️➡️), pause for Enter.
+   • Generate a new random 10×10 field with 20% holes.
+   • Loop: print field → ask question → repeat until gameOver.
+   • After the loop, print “Game Over. Thanks for playing!” (no color).
+   • Prompt “Play again? (Y/N):” with Y in green and N in red.
+   • Restart on “Y”, exit on “N”.
+
+6. Add a Welcome Screen
+   • Clear the console.
+   • Print game title, goal, controls, and “Press Enter to start…”
+   • Wait for the user to press Enter before calling playGame().
+
+7. Test All Scenarios
+   • Valid W/A/S/D moves.
+   • Invalid key presses (e.g. “X”).
+   • First out of bounds warning and second move causing game over.
+   • Stepping into a hole → Game Over.
+   • Finding the hat → success.
+   • Replay prompt correctly interprets Y/N with colored hints.
 
 _Notes:_<br>
 _- You can attach flowcharts, diagrams, and images as needed._<br>
