@@ -150,7 +150,7 @@ function playGame() {
     .toUpperCase();
 
   if (again === "Y") playGame();                     // Restart on Y
-  else { console.log("Goodbye!"); process.exit(); } // Exit on N
+  else { console.log("Goodbye!"); process.exit(); }  // Exit on N
 }
 
 // ─── Welcome screen ────────────────────────────────────────────────────────────
