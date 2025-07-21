@@ -181,7 +181,7 @@
 
 5. Implement the Main Game Loop (playGame())
    • Welcome screen: clear console, display title, goal, then the controls block in bold red with arrow emojis (⬆️⬇️⬅️➡️), pause for Enter.
-   • Generate a new random 10×10 field with 20% holes.
+   • Generate a new random 10×15 field with 20% holes.
    • Loop: print field → ask question → repeat until gameOver.
    • After the loop, print “Game Over. Thanks for playing!” (no color).
    • Prompt “Play again? (Y/N):” with Y in green and N in red.

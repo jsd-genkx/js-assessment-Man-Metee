@@ -136,7 +136,7 @@ class Field {
 
 // ─── Main game loop ────────────────────────────────────────────────────────────
 function playGame() {
-  const myField = new Field(Field.generateField(10, 10, 0.2)); // Generate field
+  const myField = new Field(Field.generateField(10, 15, 0.2)); // Generate field
   while (!myField.gameOver) {
     myField.print();                               // Display field
     myField.askQuestion();                         // Handle input
